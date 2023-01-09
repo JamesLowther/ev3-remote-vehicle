@@ -44,6 +44,7 @@ def main():
     }
 
     ev3_server = ev3.EV3Connection("0.0.0.0", 5555, move_state, color)
+    ev3_server.daemon = True
     ev3_server.start()
 
     if KEYBOARD_INPUT:
