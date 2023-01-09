@@ -1,6 +1,6 @@
 #!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import Motor, TouchSensor
+from pybricks.ev3devices import Motor, TouchSensor, ColorSensor
 from pybricks.parameters import Port, Direction, Stop
 
 import socket
@@ -24,7 +24,9 @@ right_motor = Motor(Port.A, Direction.CLOCKWISE)
 left_motor = Motor(Port.D, Direction.CLOCKWISE)
 
 camera_motor = Motor(Port.B, Direction.CLOCKWISE)
-camera_sensor =  TouchSensor(Port.S2)
+camera_sensor = TouchSensor(Port.S2)
+
+color_sensor = ColorSensor(Port.S4)
 
 def drive(state):
     left = 0
@@ -42,12 +44,12 @@ def drive(state):
         pass
 
     elif state[moves.MOVE_RIGHT] and not (state[moves.MOVE_FORWARD] or state[moves.MOVE_FORWARD]):
-        left = TURN_SPEED
-        right = TURN_SPEED // -1.1
+        left = TURN_SPEED * 0.5
+        right = TURN_SPEED // -1.2
 
     elif state[moves.MOVE_LEFT] and not (state[moves.MOVE_FORWARD] or state[moves.MOVE_FORWARD]):
-        right = TURN_SPEED
-        left = TURN_SPEED // -1.1
+        right = TURN_SPEED * 0.5
+        left = TURN_SPEED // -1.2
 
     elif state[moves.MOVE_LEFT]:
         right += TURN_SPEED
@@ -56,10 +58,6 @@ def drive(state):
     elif state[moves.MOVE_RIGHT]:
         left += TURN_SPEED
         right -= TURN_SPEED // 1.3
-
-    print(left)
-    print(right)
-    print()
 
     left_motor.run(left)
     right_motor.run(right)
@@ -79,19 +77,26 @@ def move_camera(state):
     camera_motor.run(camera)
 
 def start_vehicle(s):
+    print("Ready to drive!")
+
     while True:
-        s.sendall("get".encode())
-        data = s.recv(512)
+        color = color_sensor.rgb()
+        r = int(255 * (color[0] / 100))
+        g = int(255 * (color[1] / 100))
+        b = int(255 * (color[2] / 100))
+
+        s.sendall(json.dumps({"rgb": {"r": r, "g": g, "b": b}}))
+        data = s.recv(128)
         moves_json = data.decode("utf-8")
 
         move_state = json.loads(moves_json)
 
-        print("State: " + str(move_state))
+        # print("State: " + str(move_state))
 
         drive(move_state)
         move_camera(move_state)
 
-        msleep(20)
+        # msleep(20)
 
 def init():
     print("Intitilizing camera motor...")
@@ -104,7 +109,7 @@ def init():
 
     camera_motor.run(0)
     camera_motor.reset_angle(0)
-    camera_motor.run_angle(50, 0, then=Stop.COAST)
+    camera_motor.run_angle(100, 30, then=Stop.HOLD)
 
     print("Done.")
 

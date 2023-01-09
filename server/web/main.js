@@ -36,9 +36,15 @@ function init(websocket) {
 function receiveMessage(websocket) {
     websocket.addEventListener("message", ({ data }) => {
         const event = JSON.parse(data)
-        console.log(data)
+        if (event.rgb) {
+            var color = `rgb(${event.rgb.r},${event.rgb.g},${event.rgb.b})`
 
-        window.setTimeout(() => window.alert(event.message), 50);
+            console.log(color);
+
+            document.getElementById("colorbox").style.backgroundColor = color;
+        } else if (event.message) {
+            window.setTimeout(() => window.alert(event.message), 50);
+        }
     });
 }
 

@@ -5,20 +5,26 @@ import moves
 
 class WebsocketsServer():
 
-    def __init__(self, port, move_state):
+    def __init__(self, port, move_state, color):
         self._port = port
         self._move_state = move_state
+        self._color = color
 
         self._connections = []
 
     async def get_moves(self, websocket):
         while True:
-            state_json = await websocket.recv()
-            user_state = json.loads(state_json)
+            try:
+                state_json = await asyncio.wait_for(websocket.recv(), timeout=0.1)
+                user_state = json.loads(state_json)
 
-            print(user_state)
+                # print(user_state)
+                # print(self._color)
+                await websocket.send(json.dumps(self._color))
 
-            self._move_state.update(user_state)
+                self._move_state.update(user_state)
+            except asyncio.exceptions.TimeoutError:
+                await websocket.send(json.dumps(self._color))
 
 
     async def handler(self, websocket):

@@ -5,10 +5,11 @@ import json
 class EV3Connection(threading.Thread):
     PASSWORD = "ev3pass"
 
-    def __init__(self, host, port, move_state):
+    def __init__(self, host, port, move_state, color):
         super(EV3Connection, self).__init__()
 
         self._move_state = move_state
+        self._color = color
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -51,9 +52,16 @@ class EV3Connection(threading.Thread):
             data = conn.recv(512)
             command = data.decode("utf-8")
 
-            if not command:
-                raise TimeoutError
+            try:
+                command_json = json.loads(command)
 
-            if command == "get":
+                if not command:
+                    raise ConnectionError
+            except json.decoder.JSONDecodeError:
+                raise ConnectionError
+
+            if "rgb" in command_json.keys():
+                self._color.update(command_json)
+
                 move_state = json.dumps(self._move_state)
                 conn.sendall(move_state.encode())

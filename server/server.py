@@ -5,7 +5,7 @@ import moves
 
 KEYBOARD_INPUT = False
 
-def keyboard_input(move_queue):
+def keyboard_input(move_queue, color):
     from sshkeyboard import listen_keyboard
 
     def press(key):
@@ -34,14 +34,23 @@ def main():
         "camera_down": False,
     }
 
-    ev3_server = ev3.EV3Connection("0.0.0.0", 5555, move_state)
+    color = {
+        "rgb":
+        {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+        }
+    }
+
+    ev3_server = ev3.EV3Connection("0.0.0.0", 5555, move_state, color)
     ev3_server.start()
 
     if KEYBOARD_INPUT:
-        keyboard_input(move_state)
+        keyboard_input(move_state, color)
 
     else:
-        websockets_server = web_sockets.WebsocketsServer(8001, move_state)
+        websockets_server = web_sockets.WebsocketsServer(8001, move_state, color)
         websockets_server.start()
 
 if __name__ == "__main__":
