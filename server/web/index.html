@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Vehicle Control</title>
+    <style>
+      .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        margin: 10em;
+        padding: 10px;
+      }
+      .grid-item {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        margin: 5px;
+        font-size: 30px;
+        text-align: center;
+      }
+      .border {
+        border: 1px solid rgba(0, 0, 0, 0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container">
+      <div class="grid-item"></div>
+      <div id="w" class="grid-item border">W</div>
+      <div class="grid-item"></div>
+      <div id="a" class="grid-item border">A</div>
+      <div id="s" class="grid-item border">S</div>
+      <div id="d" class="grid-item border">D</div>
+      <div class="grid-item"></div>
+      <div class="grid-item"></div>
+      <div class="grid-item"></div>
+    </div>
+    <div class="grid-container">
+      <div id="ArrowUp" class="grid-item border">Up</div>
+      <div id="ArrowDown" class="grid-item border">Down</div>
+    </div>
+    <script src="main.js" type="module"></script>
+  </body>
+</html>
